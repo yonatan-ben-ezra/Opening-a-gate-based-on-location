@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Gate Opener</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f4f4f9;
             margin: 0;
             padding: 0;
         }
@@ -18,22 +19,10 @@
             margin-top: 20px;
         }
 
-        p {
-            color: #555;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        img {
-            max-width: 100%;
-            border-radius: 10px;
+        #map {
+            width: 100%;
+            height: 400px;
+            margin: 20px 0;
         }
 
         .btn {
@@ -55,28 +44,47 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to Smart Gate Opener</h1>
-        <p>Click the button below to manually send an SMS to open the gate.</p>
-        <img src="https://via.placeholder.com/600x300" alt="Gate Opener">
-        <a href="sms:+972504219565?body=OPEN" class="btn">Open the Gate</a>
-    </div>
+    <h1>Smart Gate Opener</h1>
+    <p>Below is your location and the radius where the SMS will be sent automatically.</p>
+    <div id="map"></div>
+    <a href="sms:+972504219565?body=OPEN" class="btn">Open the Gate Manually</a>
 
     <script>
-        // שליחה אוטומטית מבוססת מיקום ומהירות
+        // משתנה לרדיוס ולמיקום יעד
+        const targetLat = 31.722123; // Latitude של מיקום היעד
+        const targetLon = 35.221289; // Longitude של מיקום היעד
+        const targetRadius = 200; // רדיוס במטרים
+        const phoneNumber = "+972504219565"; // מספר הטלפון לשליחת ההודעה
         let lastSent = false; // מניעת שליחה חוזרת
+
+        // יצירת מפה עם Leaflet.js
+        const map = L.map('map').setView([targetLat, targetLon], 15);
+
+        // הוספת שכבת מפה
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        // סימון מיקום היעד
+        const targetCircle = L.circle([targetLat, targetLon], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.5,
+            radius: targetRadius
+        }).addTo(map);
+
+        // מעקב אחר מיקום המשתמש
         navigator.geolocation.watchPosition((position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
             const speed = position.coords.speed; // מהירות במטרים לשנייה
 
-            // מיקום יעד ומספר טלפון
-            const targetLat = 31.722123; // שנה ל-Latitude של המיקום שלך
-            const targetLon = 35.221289; // שנה ל-Longitude של המיקום שלך
-            const phoneNumber = "+972504219565"; // שנה למספר הטלפון שלך
+            // ניקוי מיקום קודם והוספת מיקום חדש
+            if (window.userMarker) map.removeLayer(window.userMarker);
+            window.userMarker = L.marker([userLat, userLon]).addTo(map);
 
-            // בדיקה אם המשתמש נמצא במיקום ומהירות מתאימים
-            const isInTargetLocation = checkLocation(latitude, longitude, targetLat, targetLon);
+            // בדיקה אם המשתמש נמצא בתוך הרדיוס
+            const isInTargetLocation = checkLocation(userLat, userLon, targetLat, targetLon);
             const isSpeedOk = speed > 10 / 3.6; // מעל 10 קמ"ש
 
             if (isInTargetLocation && isSpeedOk && !lastSent) {
@@ -96,7 +104,7 @@
         // פונקציה לבדוק אם המשתמש נמצא במרחק מתאים
         function checkLocation(lat, lon, targetLat, targetLon) {
             const distance = calculateDistance(lat, lon, targetLat, targetLon);
-            return distance < 200; // שנה את 200 למרחק הרצוי במטרים
+            return distance < targetRadius; // בדיקה לפי הרדיוס
         }
 
         // חישוב המרחק בין שני מיקומים
