@@ -85,7 +85,7 @@
 
             // בדיקה אם המשתמש נמצא בתוך הרדיוס
             const isInTargetLocation = checkLocation(userLat, userLon, targetLat, targetLon);
-            const isSpeedOk = speed > 5 / 3.6; // מעל 5 קמ"ש
+            const isSpeedOk = speed > 10 / 3.6; // מעל 10 קמ"ש
 
             if (isInTargetLocation && isSpeedOk && !lastSent) {
                 const userConfirm = confirm("Do you want to send an SMS to open the gate automatically?");
