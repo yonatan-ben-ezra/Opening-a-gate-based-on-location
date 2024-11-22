@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Gate Opener</title>
+</head>
+<body>
+    <h1>Smart Gate Opener</h1>
+    <p>This site automatically detects your location and speed to send an SMS to open the gate.</p>
+    <p>Make sure to allow location permissions!</p>
+    <script>
+        navigator.geolocation.watchPosition((position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const speed = position.coords.speed; // Speed in m/s
+
+            // Define target location and speed threshold
+            const targetLat = 31.12345;
+            const targetLon = 34.12345;
+            const speedThreshold = 10 / 3.6; // 10 km/h in m/s
+
+            const isInTargetLocation = checkLocation(latitude, longitude);
+            const isSpeedOk = speed > speedThreshold;
+
+            if (isInTargetLocation && isSpeedOk) {
+                const userConfirm = confirm("Do you want to send an SMS to open the gate?");
+                if (userConfirm) {
+                    const phoneNumber = "+1234567890"; // Replace with the gate's phone number
+                    const message = "open"; // Message to send
+                    window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
+                }
+            }
+        });
+
+        function checkLocation(lat, lon) {
+            const targetLat = 31.12345; // Replace with target latitude
+            const targetLon = 34.12345; // Replace with target longitude
+            const distance = calculateDistance(lat, lon, targetLat, targetLon);
+            return distance < 50; // Distance threshold (50 meters)
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // Earth's radius in meters
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(Δφ / 2) ** 2 +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) ** 2;
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in meters
+        }
+    </script>
+</body>
+</html>
