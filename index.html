@@ -59,7 +59,7 @@
         <h1>Welcome to Smart Gate Opener</h1>
         <p>Click the button below to manually send an SMS to open the gate.</p>
         <img src="https://via.placeholder.com/600x300" alt="Gate Opener">
-        <a href="sms:+972504219565?body=open" class="btn">Open the Gate</a>
+        <a href="sms:+972504219565?body=OPEN" class="btn">Open the Gate</a>
     </div>
 
     <script>
@@ -82,7 +82,7 @@
             if (isInTargetLocation && isSpeedOk && !lastSent) {
                 const userConfirm = confirm("Do you want to send an SMS to open the gate automatically?");
                 if (userConfirm) {
-                    window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent("open")}`;
+                    window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent("OPEN")}`;
                     lastSent = true; // עדכון שההודעה נשלחה
                 }
             }
