@@ -4,20 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Gate Opener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        p {
+            color: #555;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 18px;
+            color: #fff;
+            background: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Smart Gate Opener</h1>
-    <p>This site automatically detects your location and speed to send an SMS to open the gate.</p>
-    <p>Make sure to allow location permissions!</p>
+    <div class="container">
+        <h1>Welcome to Smart Gate Opener</h1>
+        <p>Click the button below to manually send an SMS to open the gate.</p>
+        <img src="https://via.placeholder.com/600x300" alt="Gate Opener">
+        <a href="sms:+972504219565?body=open" class="btn">Open the Gate</a>
+    </div>
+
     <script>
-        let lastSent = false; // משתנה שמונע שליחה חוזרת
+        // שליחה אוטומטית מבוססת מיקום ומהירות
+        let lastSent = false; // מניעת שליחה חוזרת
         navigator.geolocation.watchPosition((position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             const speed = position.coords.speed; // מהירות במטרים לשנייה
 
             // מיקום יעד ומספר טלפון
-            const targetLat = 31.722123; // שנה ל-Latitude של המיקום שלך   
+            const targetLat = 31.722123; // שנה ל-Latitude של המיקום שלך
             const targetLon = 35.221289; // שנה ל-Longitude של המיקום שלך
             const phoneNumber = "+972504219565"; // שנה למספר הטלפון שלך
 
@@ -26,7 +80,7 @@
             const isSpeedOk = speed > 10 / 3.6; // מעל 10 קמ"ש
 
             if (isInTargetLocation && isSpeedOk && !lastSent) {
-                const userConfirm = confirm("Do you want to send an SMS to open the gate?");
+                const userConfirm = confirm("Do you want to send an SMS to open the gate automatically?");
                 if (userConfirm) {
                     window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent("open")}`;
                     lastSent = true; // עדכון שההודעה נשלחה
