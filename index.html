@@ -1,47 +1,64 @@
-let lastSent = false; // משתנה שמונע שליחה חוזרת
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Gate Opener</title>
+</head>
+<body>
+    <h1>Smart Gate Opener</h1>
+    <p>This site automatically detects your location and speed to send an SMS to open the gate.</p>
+    <p>Make sure to allow location permissions!</p>
+    <script>
+        let lastSent = false; // משתנה שמונע שליחה חוזרת
+        navigator.geolocation.watchPosition((position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const speed = position.coords.speed; // מהירות במטרים לשנייה
 
-navigator.geolocation.watchPosition((position) => {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
-    const speed = position.coords.speed; // מהירות במטרים לשנייה
+            // מיקום יעד ומספר טלפון
+            const targetLat = 31.722123; // שנה ל-Latitude של המיקום שלך
+            const targetLon = 35.221289; // שנה ל-Longitude של המיקום שלך
+            const phoneNumber = "+972504219565"; // שנה למספר הטלפון שלך
 
-    // מיקום יעד ומהירות
-    const targetLat = 31.722123; // Latitude מותאם
-    const targetLon = 35.221289; // Longitude מותאם
-    const phoneNumber = "+972504219565"; // מספר הטלפון שלך
+            // בדיקה אם המשתמש נמצא במיקום ומהירות מתאימים
+            const isInTargetLocation = checkLocation(latitude, longitude, targetLat, targetLon);
+            const isSpeedOk = speed > 10 / 3.6; // מעל 10 קמ"ש
 
-    const isInTargetLocation = checkLocation(latitude, longitude, targetLat, targetLon);
-    const isSpeedOk = speed > 10 / 3.6; // 10 קמ"ש
+            if (isInTargetLocation && isSpeedOk && !lastSent) {
+                const userConfirm = confirm("Do you want to send an SMS to open the gate?");
+                if (userConfirm) {
+                    window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent("open")}`;
+                    lastSent = true; // עדכון שההודעה נשלחה
+                }
+            }
 
-    if (isInTargetLocation && isSpeedOk && !lastSent) {
-        const userConfirm = confirm("Do you want to send an SMS to open the gate?");
-        if (userConfirm) {
-            window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent("open")}`;
-            lastSent = true; // עדכון שההודעה נשלחה
+            // איפוס כאשר יוצאים מהרדיוס
+            if (!isInTargetLocation) {
+                lastSent = false; // איפוס כאשר יוצאים מהרדיוס
+            }
+        });
+
+        // פונקציה לבדוק אם המשתמש נמצא במרחק מתאים
+        function checkLocation(lat, lon, targetLat, targetLon) {
+            const distance = calculateDistance(lat, lon, targetLat, targetLon);
+            return distance < 200; // שנה את 200 למרחק הרצוי במטרים
         }
-    }
 
-    // מנגנון איפוס כאשר יוצאים מהרדיוס
-    if (!isInTargetLocation) {
-        lastSent = false; // איפוס כאשר יוצאים מהרדיוס
-    }
-});
+        // חישוב המרחק בין שני מיקומים
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // רדיוס כדור הארץ במטרים
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
 
-function checkLocation(lat, lon, targetLat, targetLon) {
-    const distance = calculateDistance(lat, lon, targetLat, targetLon);
-    return distance < 200; // שנה את 50 למרחק הרצוי
-}
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371e3; // רדיוס כדור הארץ במטרים
-    const φ1 = lat1 * Math.PI / 180;
-    const φ2 = lat2 * Math.PI / 180;
-    const Δφ = (lat2 - lat1) * Math.PI / 180;
-    const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(Δφ / 2) ** 2 +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ / 2) ** 2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // מרחק במטרים
-}
+            const a = Math.sin(Δφ / 2) ** 2 +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) ** 2;
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // המרחק במטרים
+        }
+    </script>
+</body>
+</html>
