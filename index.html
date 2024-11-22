@@ -17,8 +17,8 @@
             const speed = position.coords.speed; // Speed in m/s
 
             // Define target location and speed threshold
-            const targetLat = 31.12345;
-            const targetLon = 34.12345;
+            const targetLat = 31.722123;
+            const targetLon = 35.221289;
             const speedThreshold = 10 / 3.6; // 10 km/h in m/s
 
             const isInTargetLocation = checkLocation(latitude, longitude);
@@ -27,7 +27,7 @@
             if (isInTargetLocation && isSpeedOk) {
                 const userConfirm = confirm("Do you want to send an SMS to open the gate?");
                 if (userConfirm) {
-                    const phoneNumber = "+1234567890"; // Replace with the gate's phone number
+                    const phoneNumber = "+9724219565"; // Replace with the gate's phone number
                     const message = "open"; // Message to send
                     window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
                 }
