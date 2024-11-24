@@ -47,7 +47,7 @@
     <h1>Smart Gate Opener</h1>
     <p>Below is your location and the radius where the SMS will be sent automatically.</p>
     <div id="map"></div>
-    <a href="sms:+972504219565?body=OPEN" class="btn">Open the Gate Manually</a>
+    <a href="#" id="manual-button" class="btn">Open the Gate Manually</a>
 
     <script>
         // משתנה לרדיוס ולמיקום יעד
@@ -88,11 +88,10 @@
             const isSpeedOk = speed > 10 / 3.6; // מעל 10 קמ"ש
 
             if (isInTargetLocation && isSpeedOk && !lastSent) {
-                const userConfirm = confirm("Do you want to send an SMS to open the gate automatically?");
-                if (userConfirm) {
-                    window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent("OPEN")}`;
-                    lastSent = true; // עדכון שההודעה נשלחה
-                }
+                // שליחה אוטומטית של הודעה
+                window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent("OPEN")}`;
+                lastSent = true; // עדכון שההודעה נשלחה
+                provideAudioFeedback("The gate has been opened automatically.");
             }
 
             // איפוס כאשר יוצאים מהרדיוס
@@ -121,6 +120,18 @@
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             return R * c; // המרחק במטרים
         }
+
+        // הוספת חיווי קולי
+        function provideAudioFeedback(message) {
+            const utterance = new SpeechSynthesisUtterance(message);
+            speechSynthesis.speak(utterance);
+        }
+
+        // שליחה ידנית עם חיווי קולי
+        document.getElementById("manual-button").addEventListener("click", () => {
+            window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent("OPEN")}`;
+            provideAudioFeedback("The gate has been opened manually.");
+        });
     </script>
 </body>
 </html>
