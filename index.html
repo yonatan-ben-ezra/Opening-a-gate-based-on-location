@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Gate Opener</title>
+    <title>פותח שער חכם</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -12,6 +12,7 @@
             text-align: center;
             margin: 0;
             padding: 0;
+            direction: rtl; /* שינוי כיוון לטקסט מימין לשמאל */
         }
 
         h1 {
@@ -44,10 +45,10 @@
     </style>
 </head>
 <body>
-    <h1>Smart Gate Opener</h1>
-    <p>Below is your location and the radius where the SMS will be sent automatically.</p>
+    <h1>פותח שער חכם</h1>
+    <p>מטה תוכל לראות את מיקומך והרדיוס שבו תישלח הודעה אוטומטית.</p>
     <div id="map"></div>
-    <a href="#" id="manual-button" class="btn">פתיחה ידנית</a>
+    <a href="#" id="manual-button" class="btn">פתח את השער ידנית</a>
 
     <script>
         // משתנה לרדיוס ולמיקום יעד
@@ -91,7 +92,7 @@
                 // שליחה אוטומטית של הודעה
                 window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent("OPEN")}`;
                 lastSent = true; // עדכון שההודעה נשלחה
-                provideAudioFeedback("The gate has been opened automatically.");
+                provideAudioFeedback("שלח הודעה");
             }
 
             // איפוס כאשר יוצאים מהרדיוס
@@ -124,13 +125,14 @@
         // הוספת חיווי קולי
         function provideAudioFeedback(message) {
             const utterance = new SpeechSynthesisUtterance(message);
+            utterance.lang = "he-IL"; // חיווי קולי בעברית
             speechSynthesis.speak(utterance);
         }
 
         // שליחה ידנית עם חיווי קולי
         document.getElementById("manual-button").addEventListener("click", () => {
             window.location.href = `sms:${phoneNumber}?body=${encodeURIComponent("OPEN")}`;
-            provideAudioFeedback("The gate has been opened manually.");
+            provideAudioFeedback("שלח הודעה");
         });
     </script>
 </body>
